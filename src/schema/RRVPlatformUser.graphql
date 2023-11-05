@@ -1,0 +1,28 @@
+type User @entity {
+  id: ID!
+  syncingIndex: BigInt!
+}
+
+# User-Token entity for balances of tokens
+type UserToken @entity {
+  id: ID!
+  user: User!
+  token: Token!
+  totalSent: BigInt!
+  totalReceived: BigInt!
+  balance: BigInt!
+  syncingIndex: BigInt!
+}
+
+# Handle both TransferSingle and TransferBatch
+type Transfer @entity {
+  id: ID!
+  hash: String!
+  token: Token!
+  from: User!
+  to: User!
+  value: BigInt!
+  timestamp: BigInt!
+  blockNumber: BigInt!
+  syncingIndex: BigInt!
+}

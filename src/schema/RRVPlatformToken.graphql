@@ -1,0 +1,54 @@
+
+
+enum TokenType {
+    UNKNOWN
+    ERC1155
+    ERC721
+}
+
+enum TokenClaimStatus {
+    PUBLIC
+    ADMIN
+    DISABLED
+}
+
+type TokenMetadata @entity {
+    id: ID!
+    name: String
+    image: String
+    artist: String
+    description: String
+    externalUrl: String
+}
+
+type RoyaltyConfig @entity {
+    id: ID!
+    receiver: String!
+    bps: BigInt!
+}
+
+# Generic Token Identity
+type Token @entity {
+  id: ID!
+  type: TokenType!
+  name: String!
+  symbol: String!
+  metadata: TokenMetadata!
+  tokenUri: String!
+  syncingIndex: BigInt!
+}
+
+# RRVPlatform Token
+type RRVPlatformToken @entity {
+  id: ID!
+  token: Token!
+  totalSupply: BigInt!
+  maxSupply: BigInt!
+  maxClaimPerUser: BigInt!
+  price: BigInt!
+  royalties: [RoyaltyConfig!]
+  claimStatus: TokenClaimStatus!
+  creator: String!
+  timestampCreated: BigInt!
+  syncingIndex: BigInt!
+}

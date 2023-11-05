@@ -1,0 +1,25 @@
+{
+  "name": "rrv-platform-subgraph",
+  "license": "UNLICENSED",
+  "scripts": {
+    "codegen": "cat ./src/schema/*.graphql > schema.graphql && graph codegen",
+    "codegen-non-mainnet": "find ./schema -name '*.graphql' ! -name 'veToken.graphql' -exec cat {} + > schema.graphql && graph codegen",
+    "build": "graph build",
+    "prepare:main": "yarn mustache ./config/${NETWORK}.json subgraph.template.yaml subgraph.yaml && yarn mustache ./config/${NETWORK}.json ./src/utils/constants.template.ts ./src/utils/constants.ts && rm -rf generated && yarn codegen",
+    "prepare:goerli": "NETWORK=goerli yarn prepare:main",
+    "prepare:sepolia": "NETWORK=sepolia yarn prepare:main",
+    "deploy:goerli": "graph auth --product hosted-service $SUBGRAPH_API_KEY && graph deploy --product hosted-service victortanzy123/rrv-platform-goerli",
+    "deploy:sepolia": "graph auth --product hosted-service $SUBGRAPH_API_KEY && graph deploy --product hosted-service victortanzy123/rrv-platform-sepolia",
+    "deploy": "graph deploy --product hosted-service victortanzy123/rrv-platform-subgraph --deploy-key $SUBGRAPH_ACCESS_KEY",
+    "create-local": "graph create --node http://127.0.0.1:8020/victortzy/rrv-platform-subgraph",
+    "remove-local": "graph remove --node http://127.0.0.1:8020/victortzy/rrv-platform-subgraph",
+    "deploy-local": "graph deploy --node http://127.0.0.1:8020/ --ipfs http://127.0.0.1:5001 victortzy/rrv-platform-subgraph",
+    "format": "yarn prettier --write \"**/src/**/**/*.{js,ts}\""
+  },
+  "devDependencies": {
+    "@graphprotocol/graph-cli": "^0.59.0",
+    "@graphprotocol/graph-ts": "^0.27.0",
+    "mustache": "^3.1.0",
+    "prettier": "^3.0.2"
+  }
+}
