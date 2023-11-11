@@ -22,6 +22,12 @@ import {
   getTransferId,
   setSyncingIndex,
 } from '../utils/helper';
+import {
+  getPlatformFeeBps,
+  getRRVPlatformOverallData,
+} from '../entities/rrv-platform-overall-data';
+import { BPS_BI, ONE_BI, ZERO_BI } from '../utils/constants.template';
+import { getRRVPlatformUserData } from '../entities/user-data';
 
 // Handle TransferSingle events:
 export function handleTransferSingle(event: TransferSingleEvent): void {
@@ -123,6 +129,19 @@ export function handleTokenInitialisation(event: TokenInitialised): void {
   rrvPlatformToken.timestampCreated = blockTimestamp;
   rrvPlatformToken.creator = revenueRecipient;
   rrvPlatformToken.save();
+
+  // Update user statistics
+  // Update creator's statistics
+  let creatorStatistics = getRRVPlatformUserData(revenueRecipient, chainId);
+
+  creatorStatistics.created = creatorStatistics.created.plus(ONE_BI);
+  creatorStatistics.save();
+
+  // Update Overall Data
+  let overallData = getRRVPlatformOverallData();
+
+  overallData.created = overallData.created.plus(ONE_BI);
+  overallData.save();
 }
 
 export function handleTokenMint(event: TokenMint): void {
@@ -131,22 +150,60 @@ export function handleTokenMint(event: TokenMint): void {
   let hash = event.transaction.hash.toHexString();
   let tokenId = event.params.tokenId;
   let quantity = event.params.amount;
+  let proceeds = event.params.value;
+  let receiver = event.params.receiver.toHexString();
+
   // Update rrvPlatform Token object
   let rrvPlatformToken = getRRVPlatformToken(chainId, rrvPlatformAddress, tokenId);
   rrvPlatformToken.totalSupply = rrvPlatformToken.totalSupply.plus(quantity);
   rrvPlatformToken.save();
+
+  let creator = rrvPlatformToken.creator;
+
   // Create new Token Mint Record
   let tokenMintRecordId = `${chainId}-${rrvPlatformAddress}-${tokenId}-${hash}`;
   let tokenMintRecord = new TokenMintRecord(tokenMintRecordId);
   tokenMintRecord.token = rrvPlatformToken.id;
+  tokenMintRecord.metadata = rrvPlatformToken.metadata;
   tokenMintRecord.minter = event.params.minter.toHexString();
   tokenMintRecord.receiver = event.params.receiver.toHexString();
-  tokenMintRecord.value = event.params.value;
+  tokenMintRecord.value = proceeds;
   tokenMintRecord.timestamp = event.block.timestamp;
   tokenMintRecord.hash = hash;
   tokenMintRecord.quantity = quantity;
   setSyncingIndex('tokenMintRecord', tokenMintRecord);
+
   tokenMintRecord.save();
+
+  // Update Overall & Creator + Minter Statistics
+  let minterStatistics = getRRVPlatformUserData(receiver, chainId);
+
+  minterStatistics.minted = minterStatistics.minted.plus(quantity);
+  minterStatistics.uniqueMinted = minterStatistics.uniqueMinted.plus(ONE_BI);
+
+  let overallData = getRRVPlatformOverallData();
+
+  overallData.minted = overallData.minted.plus(quantity);
+  if (proceeds.gt(ZERO_BI)) {
+    let platformBps = getPlatformFeeBps(rrvPlatformAddress);
+    let feeCollected = proceeds.times(platformBps).div(BPS_BI);
+
+    // Update total revenue less platform fee for creator and also totalSpent for minter
+    let creatorStatistics = getRRVPlatformUserData(creator, chainId);
+    creatorStatistics.totalRevenue = creatorStatistics.totalRevenue.plus(
+      proceeds.minus(feeCollected)
+    );
+    minterStatistics.totalSpent = minterStatistics.totalSpent.plus(proceeds);
+
+    // Overall data
+    overallData.revenue = overallData.revenue.plus(proceeds);
+    overallData.platformFees = overallData.platformFees.plus(feeCollected);
+
+    creatorStatistics.save();
+  }
+
+  minterStatistics.save();
+  overallData.save();
 }
 
 export function handleTokenClaimStatusUpdate(event: TokenClaimStatusUpdate): void {

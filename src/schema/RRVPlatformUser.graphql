@@ -26,3 +26,14 @@ type Transfer @entity {
   blockNumber: BigInt!
   syncingIndex: BigInt!
 }
+
+type RRVPlatformUserData @entity {
+  id: ID!
+  user: User!
+  created: BigInt!
+  minted: BigInt!
+  uniqueMinted: BigInt!
+  totalSpent: BigInt!
+  totalRevenue: BigInt!
+  syncingIndex: BigInt!
+}

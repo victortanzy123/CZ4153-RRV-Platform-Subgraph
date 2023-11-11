@@ -1,0 +1,9 @@
+
+
+type RRVPlatformOverallData @entity {
+  id: ID!
+  created: BigInt!
+  minted: BigInt!
+  revenue: BigInt!
+  platformFees: BigInt!
+}

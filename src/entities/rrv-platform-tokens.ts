@@ -68,6 +68,7 @@ export function getRRVPlatformToken(
 
     let token = getToken(chainId, contractAddress, tokenId);
     rrvPlatformToken.token = token.id;
+    rrvPlatformToken.metadata = token.metadata;
 
     let rrvPlatformTokenOverallDetails = getRRVPlatformTokenOverallDetails(
       contractAddress,

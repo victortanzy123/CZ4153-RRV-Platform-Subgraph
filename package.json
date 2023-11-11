@@ -10,6 +10,7 @@
     "prepare:sepolia": "NETWORK=sepolia yarn prepare:main",
     "deploy:goerli": "graph auth --product hosted-service $SUBGRAPH_API_KEY && graph deploy --product hosted-service victortanzy123/rrv-platform-goerli",
     "deploy:sepolia": "graph auth --product hosted-service $SUBGRAPH_API_KEY && graph deploy --product hosted-service victortanzy123/rrv-platform-sepolia",
+    "deploy:sepolia-2": "graph auth --product hosted-service $SUBGRAPH_API_KEY && graph deploy --product hosted-service victortanzy123/rrv-platform-sepolia-v2",
     "deploy": "graph deploy --product hosted-service victortanzy123/rrv-platform-subgraph --deploy-key $SUBGRAPH_ACCESS_KEY",
     "create-local": "graph create --node http://127.0.0.1:8020/victortzy/rrv-platform-subgraph",
     "remove-local": "graph remove --node http://127.0.0.1:8020/victortzy/rrv-platform-subgraph",

@@ -1,11 +1,12 @@
 type TokenMintRecord @entity(immutable: true) {
-    id: ID!
-    token: Token!
-    minter: String!
-    receiver: String!
-    value: BigInt! # Value transacted
-    timestamp: BigInt!
-    hash: String!
-    quantity: BigInt!
-    syncingIndex: BigInt!
+  id: ID!
+  token: RRVPlatformToken!
+  metadata: TokenMetadata!
+  minter: String!
+  receiver: String!
+  value: BigInt! # Value transacted
+  timestamp: BigInt!
+  hash: String!
+  quantity: BigInt!
+  syncingIndex: BigInt!
 }
