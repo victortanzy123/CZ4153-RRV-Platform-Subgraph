@@ -4,6 +4,7 @@ import { UserToken } from '../../generated/schema';
 
 // Helper:
 import { ZERO_BI } from '../utils/constants.template';
+import { getTokenMetadataEntityId } from '../utils/helper';
 import { getRRVPlatformTokenEntityId, setSyncingIndex } from '../utils/helper';
 
 export function getUserToken(
@@ -19,9 +20,14 @@ export function getUserToken(
     userToken = new UserToken(id);
 
     let tokenEntityId = getRRVPlatformTokenEntityId(chainId, contractAddress, tokenId);
-
+    let tokenMetadataEntityId = getTokenMetadataEntityId(
+      chainId,
+      contractAddress,
+      tokenId
+    );
     userToken.user = user;
     userToken.token = tokenEntityId;
+    userToken.metadata = tokenMetadataEntityId;
     userToken.totalSent = ZERO_BI;
     userToken.totalReceived = ZERO_BI;
     userToken.balance = ZERO_BI;

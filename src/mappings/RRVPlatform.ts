@@ -179,7 +179,7 @@ export function handleTokenMint(event: TokenMint): void {
   let minterStatistics = getRRVPlatformUserData(receiver, chainId);
 
   minterStatistics.minted = minterStatistics.minted.plus(quantity);
-  minterStatistics.uniqueMinted = minterStatistics.uniqueMinted.plus(ONE_BI);
+  minterStatistics.uniqueMinted = minterStatistics.uniqueMinted.plus(ONE_BI); // Double confirm this
 
   let overallData = getRRVPlatformOverallData();
 
